@@ -1,0 +1,43 @@
+{
+  "app": {
+    "name": "Smart Locket",
+    "package_id": "com.mandedesign.smart_locket_flutter",
+    "version": "1.1.0",
+    "build_number": "2",
+    "description": "Mobile application for managing Bluetooth-enabled smart locket devices. Upload and sync photos wirelessly to your personal locket.",
+    "category": "Lifestyle",
+    "developer": {
+      "name": "M&E Design",
+      "email": "michael@mandedesign.studio",
+      "website": "https://mandedesign.studio"
+    },
+    "features": [
+      "Bluetooth Low Energy connectivity",
+      "Photo management and sync",
+      "Cross-platform support",
+      "Device gallery management",
+      "Automatic image processing"
+    ],
+    "permissions": {
+      "android": [
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.BLUETOOTH_SCAN",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.READ_EXTERNAL_STORAGE"
+      ],
+      "ios": [
+        "NSBluetoothAlwaysUsageDescription",
+        "NSPhotoLibraryUsageDescription"
+      ]
+    },
+    "supported_platforms": ["Android", "iOS", "Windows", "macOS", "Linux", "Web"],
+    "min_sdk": {
+      "android": 21,
+      "ios": "12.0"
+    },
+    "license": "MIT",
+    "copyright": "Copyright 2025 M&E Design"
+  }
+}

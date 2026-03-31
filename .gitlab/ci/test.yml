@@ -1,0 +1,33 @@
+# Extended test configuration for GitLab CI
+
+.test_template: &test_template
+  image: cirrusci/flutter:stable
+  before_script:
+    - flutter doctor -v
+    - flutter pub get
+  cache:
+    key: flutter-cache
+    paths:
+      - .dart_tool/
+      - ~/.pub-cache/
+
+unit_tests:
+  <<: *test_template
+  stage: test
+  script:
+    - flutter test --coverage --reporter=json > test-results.json
+  artifacts:
+    reports:
+      junit: test-results.json
+    paths:
+      - coverage/lcov.info
+    expire_in: 1 week
+
+widget_tests:
+  <<: *test_template
+  stage: test
+  script:
+    - flutter test test/widget_test.dart
+  artifacts:
+    when: always
+    expire_in: 1 week

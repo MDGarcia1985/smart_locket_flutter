@@ -1,0 +1,163 @@
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  FLUTTER_VERSION: "3.24.0"
+  ANDROID_COMPILE_SDK: "34"
+  ANDROID_BUILD_TOOLS: "34.0.0"
+  ANDROID_SDK_TOOLS: "9477386"
+
+before_script:
+  - apt-get update -qq && apt-get install -y -qq git curl unzip
+  - git clone https://github.com/flutter/flutter.git -b stable --depth 1
+  - export PATH="$PATH:`pwd`/flutter/bin"
+  - flutter doctor -v
+  - flutter pub get
+
+# Unit and Widget Tests
+test:
+  stage: test
+  image: cirrusci/flutter:stable
+  script:
+    - flutter test --coverage
+    - flutter test --machine > test-results.json
+  coverage: '/lines......: \d+\.\d+\%/'
+  artifacts:
+    reports:
+      junit: test-results.json
+      coverage_report:
+        coverage_format: lcov
+        path: coverage/lcov.info
+    paths:
+      - coverage/
+    expire_in: 1 week
+  only:
+    - merge_requests
+    - main
+    - develop
+
+# Code Analysis
+analyze:
+  stage: test
+  image: cirrusci/flutter:stable
+  script:
+    - flutter analyze --fatal-infos
+  only:
+    - merge_requests
+    - main
+    - develop
+
+# Integration Tests
+integration_test:
+  stage: test
+  image: cirrusci/flutter:stable
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay2
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq git curl unzip openjdk-11-jdk
+    - git clone https://github.com/flutter/flutter.git -b stable --depth 1
+    - export PATH="$PATH:`pwd`/flutter/bin"
+    - export JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
+    - flutter doctor -v
+    - flutter pub get
+  script:
+    - flutter test integration_test/
+  artifacts:
+    paths:
+      - integration_test/screenshots/
+    expire_in: 1 week
+  only:
+    - merge_requests
+    - main
+    - develop
+  allow_failure: true
+
+# Build Android APK
+build_android:
+  stage: build
+  image: cirrusci/flutter:stable
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq git curl unzip openjdk-11-jdk
+    - git clone https://github.com/flutter/flutter.git -b stable --depth 1
+    - export PATH="$PATH:`pwd`/flutter/bin"
+    - export JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
+    - flutter doctor -v
+    - flutter pub get
+  script:
+    - flutter build apk --release
+  artifacts:
+    paths:
+      - build/app/outputs/flutter-apk/app-release.apk
+    expire_in: 1 week
+  only:
+    - main
+    - develop
+    - tags
+
+# Build iOS (requires macOS runner)
+build_ios:
+  stage: build
+  tags:
+    - macos
+  script:
+    - flutter build ios --release --no-codesign
+  artifacts:
+    paths:
+      - build/ios/iphoneos/Runner.app
+    expire_in: 1 week
+  only:
+    - main
+    - develop
+    - tags
+  allow_failure: true
+
+# Build Web
+build_web:
+  stage: build
+  image: cirrusci/flutter:stable
+  script:
+    - flutter build web --release
+  artifacts:
+    paths:
+      - build/web/
+    expire_in: 1 week
+  only:
+    - main
+    - develop
+    - tags
+
+# Deploy to staging (example)
+deploy_staging:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - echo "Deploying to staging environment"
+    # Add your deployment commands here
+  environment:
+    name: staging
+    url: https://staging.yourapp.com
+  only:
+    - develop
+  when: manual
+
+# Deploy to production (example)
+deploy_production:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - echo "Deploying to production environment"
+    # Add your deployment commands here
+  environment:
+    name: production
+    url: https://yourapp.com
+  only:
+    - main
+  when: manual

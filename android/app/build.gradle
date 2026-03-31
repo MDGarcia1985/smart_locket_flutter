@@ -1,0 +1,50 @@
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+apply plugin: 'com.android.application'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
+android {
+    namespace "com.example.smart_locket_flutter"
+    compileSdkVersion 34
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        applicationId "com.example.smart_locket_flutter"
+        minSdkVersion 21
+        targetSdkVersion 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            // For production, use a release keystore instead of signingConfigs.debug
+            signingConfig signingConfigs.debug
+        }
+    }
+}
+
+dependencies {
+    // Import the Firebase BoM (Bill of Materials) to pin Firebase library versions
+    implementation platform('com.google.firebase:firebase-bom:34.9.0')
+    // Firebase Analytics (used by Auth and other Firebase products)
+    implementation 'com.google.firebase:firebase-analytics'
+    // https://firebase.google.com/docs/android/setup#available-libraries
+}
+
+apply plugin: 'com.google.gms.google-services'

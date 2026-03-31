@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "667743042675",
+    "project_id": "smartlocket",
+    "storage_bucket": "smartlocket.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:667743042675:android:5f6c6294520d19a1bebe06",
+        "android_client_info": {
+          "package_name": "com.example.smart_locket_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5Ak73ZwmPZ1mvVTqED8atpgtlmitRvlk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
